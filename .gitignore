@@ -1,0 +1,22 @@
+# Compiled program
+/epicheck
+
+# Object and dependency files
+*.o
+*.d
+
+# Build directories and tools
+/build/
+/compile_commands.json
+
+# Generated reports and archives
+/epicheck-report.html
+/epicheck-report.json
+/epicheck-*.tar.gz
+
+# Editor settings
+/.vscode/
+/.idea/
+
+# macOS files
+.DS_Store
