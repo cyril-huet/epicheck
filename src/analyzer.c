@@ -385,8 +385,6 @@ static void finish_function(const char *path, const Function *function,
     if (function->exported && implementation_file(path))
     {
         report->exported++;
-        issue_add(&report->exported_functions, path, function->name,
-                  function->start, 0);
     }
 }
 
@@ -417,6 +415,8 @@ void analyze_source(const char *path, const Options *options, Report *report)
     int block_comment = 0;
     int candidate = 0;
     int brace_depth = 0;
+    int exported_before = report->exported;
+    int file_exported;
 
     if (file == NULL)
     {
@@ -471,4 +471,16 @@ void analyze_source(const char *path, const Options *options, Report *report)
         }
     }
     fclose(file);
+
+    file_exported = report->exported - exported_before;
+
+    if (file_exported > report->max_file_exported)
+    {
+        report->max_file_exported = file_exported;
+    }
+    if (file_exported > options->max_exported)
+    {
+        issue_add(&report->exported_files, path, "exported functions", 1,
+                  file_exported);
+    }
 }

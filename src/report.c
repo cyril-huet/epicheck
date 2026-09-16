@@ -34,7 +34,7 @@ int report_has_errors(const Options *options, const Report *report)
     {
         return 1;
     }
-    if (report->exported > options->max_exported)
+    if (report->exported_files.len > 0)
     {
         return 1;
     }
@@ -103,10 +103,9 @@ static void text_summary(const Options *options, const Report *report)
     snprintf(detail, sizeof(detail), "%d function(s)",
              report->many_arguments.len);
     text_status(options, "arguments", report->many_arguments.len == 0, detail);
-    snprintf(detail, sizeof(detail), "%d / %d", report->exported,
-             options->max_exported);
-    text_status(options, "exports", report->exported <= options->max_exported,
-                detail);
+    snprintf(detail, sizeof(detail), "%d / %d per file",
+             report->max_file_exported, options->max_exported);
+    text_status(options, "exports", report->exported_files.len == 0, detail);
     if (!options->check_ascii)
     {
         text_status(options, "ascii", 1, "disabled");
@@ -196,9 +195,8 @@ static void print_compile_output(const CompileIssue *issue)
 static void text_details(const Options *options, const Report *report)
 {
     int has_details = report->format_errors.len || report->long_functions.len
-        || report->many_arguments.len
-        || report->exported > options->max_exported || report->non_ascii.len
-        || report->compile_errors.len;
+        || report->many_arguments.len || report->exported_files.len
+        || report->non_ascii.len || report->compile_errors.len;
 
     if (!has_details)
     {
@@ -209,9 +207,10 @@ static void text_details(const Options *options, const Report *report)
     text_issues("Functions too long", &report->long_functions, "lines");
     text_issues("Functions with too many arguments", &report->many_arguments,
                 "arguments");
-    if (report->exported > options->max_exported)
+    if (report->exported_files.len > 0)
     {
-        text_issues("Exported functions", &report->exported_functions, "");
+        text_issues("Files with too many exported functions",
+                    &report->exported_files, "functions");
     }
     text_issues("Non-ASCII characters", &report->non_ascii, "byte");
     for (int index = 0; index < report->compile_errors.len; index++)
@@ -372,12 +371,8 @@ static void print_json(const Options *options, const Report *report)
                     "function exceeds the line limit");
     json_issue_list(&first, "function-arguments", &report->many_arguments,
                     "function exceeds the argument limit");
-    if (report->exported > options->max_exported)
-    {
-        json_issue_list(&first, "exported-function",
-                        &report->exported_functions,
-                        "too many exported functions");
-    }
+    json_issue_list(&first, "exported-functions", &report->exported_files,
+                    "file has too many exported functions");
     json_issue_list(&first, "non-ascii", &report->non_ascii,
                     "non-ASCII byte found");
     json_compile_issues(&first, &report->compile_errors);
@@ -623,9 +618,9 @@ static void html_summary(FILE *file, const Options *options,
         state = "PASS";
     }
     html_summary_row(file, "Arguments", state, detail);
-    snprintf(detail, sizeof(detail), "%d / %d", report->exported,
-             options->max_exported);
-    if (report->exported > options->max_exported)
+    snprintf(detail, sizeof(detail), "%d / %d per file",
+             report->max_file_exported, options->max_exported);
+    if (report->exported_files.len > 0)
     {
         state = "FAIL";
     }
@@ -692,10 +687,7 @@ static int html_issue_count(const Options *options, const Report *report)
         + report->many_arguments.len + report->non_ascii.len
         + report->compile_errors.len + report->scan_errors;
 
-    if (report->exported > options->max_exported)
-    {
-        count += report->exported_functions.len;
-    }
+    count += report->exported_files.len;
     if (options->strict)
     {
         count += report->format_missing + report->compile_missing;
@@ -744,11 +736,8 @@ static void html_issues(FILE *file, const Options *options,
                     "Function exceeds the line limit");
     html_issue_list(file, "Arguments", &report->many_arguments,
                     "Function exceeds the argument limit");
-    if (report->exported > options->max_exported)
-    {
-        html_issue_list(file, "Exported function", &report->exported_functions,
-                        "Too many exported functions");
-    }
+    html_issue_list(file, "Exported functions", &report->exported_files,
+                    "File has too many exported functions");
     html_issue_list(file, "ASCII", &report->non_ascii, "Non-ASCII byte found");
     html_compile_issues(file, &report->compile_errors);
     if (report->scan_errors > 0)
@@ -860,11 +849,8 @@ static void print_github(const Options *options, const Report *report)
                       "function exceeds the line limit");
     github_issue_list("function arguments", &report->many_arguments,
                       "function exceeds the argument limit");
-    if (report->exported > options->max_exported)
-    {
-        github_issue_list("exports", &report->exported_functions,
-                          "too many exported functions");
-    }
+    github_issue_list("exports", &report->exported_files,
+                      "file has too many exported functions");
     github_issue_list("ASCII", &report->non_ascii, "non-ASCII byte found");
     for (int index = 0; index < report->compile_errors.len; index++)
     {
@@ -927,7 +913,7 @@ void report_free(Report *report)
     free(report->format_errors.data);
     free(report->long_functions.data);
     free(report->many_arguments.data);
-    free(report->exported_functions.data);
+    free(report->exported_files.data);
     free(report->non_ascii.data);
     free(report->compile_errors.data);
 }

@@ -143,7 +143,7 @@ Summary
   format       OK    0 error(s), 0 fixed
   length       OK    0 function(s)
   arguments    OK    0 function(s)
-  exports      OK    8 / 10
+  exports      OK    8 / 10 per file
   ascii        OK    0 line(s)
   compile      OK    7 / 7 passed
 
@@ -223,7 +223,7 @@ GitHub output creates annotations that are visible directly in a workflow:
 | `--cxxflags FLAGS` | Add flags when checking C++ files |
 | `--max-lines N` | Set the maximum lines per function |
 | `--max-args N` | Set the maximum arguments per function |
-| `--max-exported N` | Set the maximum exported functions |
+| `--max-exported N` | Set the maximum exported functions per file |
 
 ### Output and other options
 

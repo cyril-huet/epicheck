@@ -86,6 +86,7 @@ typedef struct
     int format_fixed;
     int format_missing;
     int exported;
+    int max_file_exported;
     int compile_files;
     int compile_bad;
     int compile_missing;
@@ -93,7 +94,7 @@ typedef struct
     IssueList format_errors;
     IssueList long_functions;
     IssueList many_arguments;
-    IssueList exported_functions;
+    IssueList exported_files;
     IssueList non_ascii;
     CompileIssueList compile_errors;
 } Report;

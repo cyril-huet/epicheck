@@ -37,7 +37,8 @@ void print_usage(const char *program)
     printf("  --cxxflags FLAGS           extra flags for C++ files\n");
     printf("  --max-lines N              maximum lines per function\n");
     printf("  --max-args N               maximum arguments per function\n");
-    printf("  --max-exported N           maximum exported functions\n\n");
+    printf(
+        "  --max-exported N           maximum exported functions per file\n\n");
     printf("Output:\n");
     printf("  --output FORMAT            text, json, html or github\n");
     printf("  --no-color                 disable ANSI colors\n\n");

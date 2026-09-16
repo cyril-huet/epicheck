@@ -55,7 +55,7 @@ run_check_tests()
         --no-ascii --max-exported 2
 
     expect_success \
-        'accept project under higher export limit' \
+        'apply export limit to each file' \
         "$EPICHECK" "$TEST_ROOT/exports" --no-format --no-compile \
         --no-ascii --max-exported 3
 

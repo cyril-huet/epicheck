@@ -100,7 +100,13 @@ create_fixtures()
         'int first_export(void) { return 1; }' \
         'int second_export(void) { return 2; }' \
         'int third_export(void) { return 3; }' \
-        >"$TEST_ROOT/exports/exports.c"
+        >"$TEST_ROOT/exports/first.c"
+
+    printf '%s\n' \
+        'int fourth_export(void) { return 4; }' \
+        'int fifth_export(void) { return 5; }' \
+        'int sixth_export(void) { return 6; }' \
+        >"$TEST_ROOT/exports/second.c"
 
     printf '%s\n' \
         '#ifndef FIRST_VALUE' \
