@@ -1,5 +1,10 @@
 # EPICheck
 
+[![CI](https://github.com/cyril-huet/epicheck/actions/workflows/ci.yml/badge.svg)](https://github.com/cyril-huet/epicheck/actions/workflows/ci.yml)
+![C](https://img.shields.io/badge/C-C11-blue)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS-lightgrey)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 EPICheck is a small command-line tool written in C that checks C and C++
 projects.
 
@@ -25,6 +30,16 @@ The project covers concepts such as:
 - dynamic arrays
 - text, JSON, HTML and GitHub reports
 - shell-based integration tests
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Project files] --> B[Scanner]
+    B --> C[Analyzer]
+    C --> D[Checks]
+    D --> E[Reports]
+```
 
 ## Features
 
@@ -113,6 +128,26 @@ Use different code limits:
 
 ```sh
 ./epicheck . --max-lines 50 --max-args 6 --max-exported 20
+```
+
+### Example
+
+```console
+$ ./epicheck my-project
+
+EPICheck 1.1.0
+Project: my-project
+Files: 8, functions: 42
+
+Summary
+  format       OK    0 error(s), 0 fixed
+  length       OK    0 function(s)
+  arguments    OK    0 function(s)
+  exports      OK    8 / 10
+  ascii        OK    0 line(s)
+  compile      OK    7 / 7 passed
+
+Result: all checks passed
 ```
 
 ## Output formats
