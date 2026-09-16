@@ -192,6 +192,8 @@ xdg-open epicheck-report.html
 The report contains its own CSS and works without an internet connection.
 An existing `epicheck-report.html` file is replaced.
 
+![EPICheck HTML report](docs/epicheck-report.png)
+
 ### GitHub Actions
 
 GitHub output creates annotations that are visible directly in a workflow:
