@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Build the project with several systems and compilers.
+  build-and-test:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu GCC
+            os: ubuntu-latest
+            compiler: gcc
+            cxx_compiler: g++
+          - name: Ubuntu Clang
+            os: ubuntu-latest
+            compiler: clang
+            cxx_compiler: clang++
+          - name: macOS Clang
+            os: macos-latest
+            compiler: clang
+            cxx_compiler: clang++
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.compiler }}
+      CXX: ${{ matrix.cxx_compiler }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: make
+
+      - name: Run integration tests
+        run: make test
+
+  # Check the source formatting and run EPICheck on its own code.
+  format:
+    name: clang-format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Check formatting
+        run: make check-format
+
+      - name: Build EPICheck
+        run: make
+
+      - name: Run EPICheck on itself
+        run: ./epicheck . --strict --max-lines 50 --max-args 7 --max-exported 30 --output github
+
+  # Look for memory errors and undefined behavior.
+  sanitizers:
+    name: ASan and UBSan
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      ASAN_OPTIONS: detect_leaks=1
+      UBSAN_OPTIONS: halt_on_error=1
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build with sanitizers
+        run: make sanitize
+
+      - name: Run integration tests
+        run: make test
